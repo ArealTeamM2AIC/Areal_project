@@ -1,8 +1,11 @@
-This is a sample starting kit for the Iris challenge. 
-It uses the well known Iris dataset from Fisher's classic paper (Fisher, 1936). The data set contains 3 classes of 50 instances each, where each class refers to a type of iris plant. One class is linearly separable from the other 2; the latter are NOT linearly separable from each other.
+This is a starting kit for the Inria Aerial Image Labeling challenge. 
+We use the INRIA satelite from [link](https://project.inria.fr/aerialimagelabeling/). The data set contains 180 of high resolution satelite images of 5 towns, each having 36 images. For every image, there is a reference image. In this case, the tiles are single-channel images with values 255 for the building class and 0 for the not building class.
 
 References and credits: 
-R. A. Fisher. The use of multiple measurements in taxonomic problems. Annual Eugenics, 7, Part II, 179-188 (1936). 
+Emmanuel Maggiori, Yuliya Tarabalka, Guillaume Charpiat, Pierre Alliez. Can Semantic Labeling
+Methods Generalize to Any City? The Inria Aerial Image Labeling Benchmark. IEEE International
+Symposium on Geoscience and Remote Sensing (IGARSS), Jul 2017, Fort Worth, United States.
+<hal-01468452>
 
 Prerequisites:
 Install Anaconda Python 3.6.6 
@@ -11,7 +14,7 @@ Usage:
 
 (1) If you are a challenge participant:
 
-- The file README.ipynb contains step-by-step instructions on how to create a sample submission for the Iris challenge. 
+- The file README.ipynb contains step-by-step instructions on how to create a sample submission for the Inria Aerial Image Labeling challenge. 
 At the prompt type:
 jupyter-notebook README.ipynb
 
@@ -38,12 +41,3 @@ then zip the contents of sample_result_submission (without the directory).
     `python scoring_program/score.py sample_data sample_result_submission scoring_output`
 
 - the metric identified by metric.txt in the utilities directory is the metric used both to compute performances in README.ipynb and for the challenge.
-
-- your code also runs within the Codalab docker (inside the docker, python 3.6 is called python3):
-
-	`docker run -it -v `pwd`:/home/aux codalab/codalab-legacy:py3`
-	
-	`DockerPrompt# cd /home/aux`
-	`DockerPrompt# python3 ingestion_program/ingestion.py sample_data sample_result_submission ingestion_program sample_code_submission`
-	`DockerPrompt# python3 scoring_program/score.py sample_data sample_result_submission scoring_output`
-	`DockerPrompt# exit`
