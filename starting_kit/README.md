@@ -1,6 +1,9 @@
 This is a starting kit for the Inria Aerial Image Labeling challenge. 
-We use the INRIA satelite from [link](https://project.inria.fr/aerialimagelabeling/). The data set contains 180 of high resolution satelite images of 5 towns, each having 36 images. For every image, there is a reference image. In this case, the tiles are single-channel images with values 255 for the building class and 0 for the not building class.
+We use the INRIA satelite dataset from [link](https://project.inria.fr/aerialimagelabeling/). The data set contains 180 of high resolution satelite images of 5 towns, each having 36 images. For every image, there is a reference image. In a reference image, the tiles are single-channel images with values 255 for the building class and 0 for the not building class.
 
+Example pictures of Chicago
+![picture](https://project.inria.fr/aerialimagelabeling/files/2011/12/chi1.jpg)
+![picture](https://project.inria.fr/aerialimagelabeling/files/2011/12/chi2.jpg)
 References and credits: 
 Emmanuel Maggiori, Yuliya Tarabalka, Guillaume Charpiat, Pierre Alliez. Can Semantic Labeling
 Methods Generalize to Any City? The Inria Aerial Image Labeling Benchmark. IEEE International
