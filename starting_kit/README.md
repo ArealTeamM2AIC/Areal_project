@@ -4,7 +4,7 @@ We use the INRIA satelite dataset from [link](https://project.inria.fr/aerialima
 Example pictures of Chicago
 Image             								 |  Reference
 :-------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------:
-![picture](https://project.inria.fr/aerialimagelabeling/files/2011/12/chi1.jpg)  | ![picture](https://project.inria.fr/aerialimagelabeling/files/2011/12/chi2.jpg)
+![picture](https://project.inria.fr/aerialimagelabeling/files/2011/12/chi1.jpg=250x250)  | ![picture](https://project.inria.fr/aerialimagelabeling/files/2011/12/chi2.jpg=250x250)
 
 
 References and credits: 
