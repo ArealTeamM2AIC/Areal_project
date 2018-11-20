@@ -4,8 +4,8 @@ from os import listdir
 from os.path import isfile, join
 
 
-def load_images_in_path(path):
-    return {f: load_one_image(join(path, f)) for f in listdir(path) if isfile(join(path, f))}
+def load_images_in_path(path, limit_file_per_town):
+    return {f: load_one_image(join(path, f)) for f in listdir(path) if isfile(join(path, f)) and int(re.search("[0-9]+", f).group(0)) < limit_file_per_town}
 
 
 def load_one_image(file):
