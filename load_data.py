@@ -5,7 +5,15 @@ from os.path import isfile, join
 
 
 def load_images_in_path(path):
-    return {f: load_one_image(join(path, f)) for f in listdir(path) if isfile(join(path, f))}
+    res = dict()
+    for i, f in enumerate(listdir(path)):
+        if isfile(join(path, f)):
+            temp = Image.open(join(path, f))
+            img = temp.copy()
+            res[f] = img
+            temp.close()
+    return res
+    # return {f: load_one_image(join(path, f)) for i, f in enumerate(listdir(path)) if isfile(join(path, f)) and i < 100}
 
 
 def load_one_image(file):
