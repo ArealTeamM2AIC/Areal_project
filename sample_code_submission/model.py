@@ -89,8 +89,8 @@ class model (BaseEstimator):
             H : height
             W : width
             N : number of image
-        param y : list(numpy.ndarray)
-            numpy.ndarray.shape = (W * H)
+        param y : numpy.ndarray
+            numpy.ndarray.shape = (N, W * H)
             H : height
             W : width
         '''
@@ -121,13 +121,13 @@ class model (BaseEstimator):
                 splitted_gt = th.split(utils.to_float_tensor(gt), self.batch_size, dim=0)
 
                 # iter over mini batchs
-                for o, y in zip(list(splitted_out), list(splitted_gt)):
+                for o, g in zip(list(splitted_out), list(splitted_gt)):
                     self.optim.zero_grad()
 
                     # pass mini batch to linear model
                     out_batch = self.lin_model(o)
                     # compute loss value
-                    loss = self.loss_fn(out_batch, y.view(-1,1))
+                    loss = self.loss_fn(out_batch, g.view(-1,1))
 
                     # backward over the graph model
                     loss.backward(retain_graph=True)
@@ -141,7 +141,7 @@ class model (BaseEstimator):
                     print("Epoch %d, image %d" % (i, j))
 
             # divide loss sum by the number of image
-            loss_mean /= len(train_np)
+            loss_mean = loss_sum / X.shape[0]
             if self.verbose:
                 print("[Epoch %d] loss = %f" % (i, loss_mean))
 
@@ -156,7 +156,7 @@ class model (BaseEstimator):
             W : width
             N : number of image
         return : numpy.ndarray
-            numpy.ndarray.shape = (N, W * H)
+            numpy.ndarray.shape = (N * W * H)
         '''
         if len(X.shape) != 5:
             exit("X.shape = (N, 1, C, H, W), len(X.shape) != 5 !")
@@ -170,7 +170,7 @@ class model (BaseEstimator):
         self.lin_model.eval()
 
         # create empty ndarray for results
-        res = np.zeros((X.shape[0], X.shape[3] * X.shape[4]))
+        res = np.zeros((X.shape[0]* X.shape[3] * X.shape[4]))
 
         # iter over images
         for j, img in enumerate(X):
@@ -179,7 +179,7 @@ class model (BaseEstimator):
             # Linear
             pred = self.lin_model(out_conv)
             # add results for the j-th image
-            res[j,:] = pred.detach().numpy().reshape(-1)
+            res[j * X.shape[3] * X.shape[4]:(j + 1) * X.shape[3] * X.shape[4]] = pred.detach().numpy().reshape(-1)
 
         return res
 
