@@ -8,44 +8,56 @@ import sample_code_submission.utils as utils
 
 class ConvModel(nn.Module):
     def __init__(self, in_channels, out_channels):
+        '''
+            Single convolution layer module
+        '''
         super(ConvModel, self).__init__()
         self.out_channels = out_channels
 
+        # convolution with square kernel of size 5
+        # padding is equal to 2 beceause we need to produce
+        # for each pixels on vector (with stride equals to 1)
         self.conv1 = nn.Conv2d(in_channels, self.out_channels, kernel_size=(5,5), padding=2)
         self.rel_conv1 = nn.ReLU()
 
-        #kernel_pool = (3,3)
-        #self.pool = nn.MaxPool2d(kernel_pool, stride=1, padding=1)
-
     def forward(self, data):
+        '''
+            Forward function
+
+            param data: troch.tensor of size (1, in_channels, W, H)
+            return: torch.tensor of size (W * H, out_channels)
+        '''
         # data.size() = (1, in_channels, w, h)
         out = self.conv1(data)
         out = self.rel_conv1(out)
-
-        #out = self.pool(out)
-
         # out.size() = (1,self.out_channels, w, h)
+
         # squeeze(0) -> (self.out_channels, w, h)
         # permute(1, 2, 0) -> (w, h, self.out_channels)
         out = out.squeeze(0).permute(1, 2, 0)
+
+        # view(-1, out_channels) -> (w * h, out_channels)
         return out.contiguous().view(-1, self.out_channels)
 
 class LinModel(nn.Module):
     def __init__(self, out_channels):
+        '''
+            Single linear layer module
+        '''
         super(LinModel, self).__init__()
         self.out_channels = out_channels
 
-        self.lin1 = nn.Linear(self.out_channels, self.out_channels * 2)
-        self.act1 = nn.ReLU()
-
-        self.lin2 = nn.Linear(self.out_channels * 2, 1)
-        self.act2 = nn.Sigmoid()
+        # Output layer
+        self.lin = nn.Linear(self.out_channels, 1)
+        self.act = nn.Sigmoid()
 
     def forward(self, data):
-        out = self.lin1(data)
-        out = self.act1(out)
-        out = self.lin2(out)
-        return self.act2(out)
+        '''
+            param data: torch.tensor of size (w * h, out_channels)
+            return: torch.tensor of size (w * h, 1)
+        '''
+        out = self.lin(data)
+        return self.act(out)
 
 
 class model (BaseEstimator):
@@ -89,36 +101,49 @@ class model (BaseEstimator):
         if X.shape[2] != 3:
             exit("X.shape = (N, 1, C, H, W), X.shape[2] must be 3 !")
 
+        # pass both models in train mode
         self.conv_model.train()
         self.lin_model.train()
 
+        # loop over epochs
         for i in range(self.nb_epoch):
-            sum_loss = 0
+            # loss sum for one epoch
+            loss_sum = 0
 
+            # iter over images and ground truths
             for j, (img, gt) in enumerate(zip(X, y)):
 
+                # pass image to CNN
                 out = self.conv_model(utils.to_float_tensor(img))
 
+                # split the flatten image and ground truth in mini batchs
                 splitted_out = th.split(out, self.batch_size, dim=0)
                 splitted_gt = th.split(utils.to_float_tensor(gt), self.batch_size, dim=0)
 
+                # iter over mini batchs
                 for o, y in zip(list(splitted_out), list(splitted_gt)):
                     self.optim.zero_grad()
 
+                    # pass mini batch to linear model
                     out_batch = self.lin_model(o)
+                    # compute loss value
                     loss = self.loss_fn(out_batch, y.view(-1,1))
 
+                    # backward over the graph model
                     loss.backward(retain_graph=True)
+                    # update weights
                     self.optim.step()
 
-                    sum_loss += loss.item()
+                    # add loss value
+                    loss_sum += loss.item()
 
                 if self.verbose:
                     print("Epoch %d, image %d" % (i, j))
 
-            sum_loss /= len(train_np)
+            # divide loss sum by the number of image
+            loss_mean /= len(train_np)
             if self.verbose:
-                print("[Epoch %d] loss = %f" % (i, sum_loss))
+                print("[Epoch %d] loss = %f" % (i, loss_mean))
 
         self.is_trained = True
 
@@ -140,13 +165,22 @@ class model (BaseEstimator):
         if X.shape[2] != 3:
             exit("X.shape = (N, 1, C, H, W), X.shape[2] must be 3 !")
 
+        # switch models to eval mode
         self.conv_model.eval()
         self.lin_model.eval()
+
+        # create empty ndarray for results
         res = np.zeros((X.shape[0], X.shape[3] * X.shape[4]))
+
+        # iter over images
         for j, img in enumerate(X):
+            # CNN
             out_conv = self.conv_model(utils.to_float_tensor(img))
+            # Linear
             pred = self.lin_model(out_conv)
+            # add results for the j-th image
             res[j,:] = pred.detach().numpy().reshape(-1)
+
         return res
 
     def save(self, path="./"):
