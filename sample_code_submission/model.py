@@ -90,7 +90,8 @@ class model (BaseEstimator):
             W : width
             N : number of image
         param y : numpy.ndarray
-            numpy.ndarray.shape = (N, W * H)
+            numpy.ndarray.shape = (N * W * H)
+            N : number of sample
             H : height
             W : width
         '''
@@ -104,6 +105,9 @@ class model (BaseEstimator):
         # pass both models in train mode
         self.conv_model.train()
         self.lin_model.train()
+
+        # reshape for loop over samples
+        y = y.reshape(X.shape[0], X.shape[-2] * X.shape[-1])
 
         # loop over epochs
         for i in range(self.nb_epoch):
